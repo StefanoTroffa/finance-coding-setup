@@ -1,0 +1,42 @@
+[project]
+name = "finance-coding-setup"
+version = "0.1.0"
+description = "Python environment for financial data analysis and document processing"
+requires-python = ">=3.11"
+
+dependencies = [
+    # Data manipulation
+    "pandas>=2.0",
+    "numpy>=1.24",
+
+    # Financial data sources
+    "yfinance>=0.2",
+    "fredapi>=0.5",
+    "requests>=2.31",
+
+    # Excel (read + write)
+    "openpyxl>=3.1",
+    "xlsxwriter>=3.1",
+
+    # Visualization
+    "plotly>=5.18",
+
+    # Document analysis
+    "pdfplumber>=0.10",          # Extract text and tables from PDFs
+    "python-docx>=1.1",          # Read/write Word documents
+
+    # Environment and config
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+# PDF table extraction with Java (more accurate for complex tables)
+# Install: uv pip install finance-coding-setup[pdf-tables]
+# Requires Java: brew install java (Mac) or java.com (Windows)
+pdf-tables = ["tabula-py>=2.9"]
+
+# Bloomberg Terminal users
+bloomberg = ["blpapi"]
+
+# Heavy PDF processing (requires system dependencies)
+pdf-extra = ["camelot-py[cv]"]

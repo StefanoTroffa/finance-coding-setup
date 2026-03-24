@@ -1,0 +1,22 @@
+# API keys and secrets
+.env
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.python-version
+
+# uv
+uv.lock
+
+# Output files (generated, not tracked)
+finance-outputs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Excel temp files
+~$*.xlsx

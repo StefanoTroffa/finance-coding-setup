@@ -1,0 +1,79 @@
+#!/bin/bash
+# Layer 3: Pre-commit git hook — last defense secret scan
+# Catches hardcoded secrets in staged .py files before they reach GitHub.
+# If this fires, Layers 1-2 were bypassed somehow.
+
+STAGED_PY=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$')
+
+if [ -z "$STAGED_PY" ]; then
+    exit 0
+fi
+
+FOUND=""
+
+for file in $STAGED_PY; do
+    # Read staged content (not working tree — catches what's actually being committed)
+    CONTENT=$(git show ":$file" 2>/dev/null)
+    if [ -z "$CONTENT" ]; then
+        continue
+    fi
+
+    # Process line by line
+    LINE_NUM=0
+    while IFS= read -r line; do
+        LINE_NUM=$((LINE_NUM + 1))
+
+        # Skip lines that reference environment variables (not hardcoded)
+        if echo "$line" | grep -qE 'os\.getenv|os\.environ|dotenv|getenv|environ\.get'; then
+            continue
+        fi
+
+        # Skip comments
+        stripped=$(echo "$line" | sed 's/^[[:space:]]*//')
+        if [[ "$stripped" == \#* ]]; then
+            continue
+        fi
+
+        # Pattern 1: Anthropic API keys
+        if echo "$line" | grep -qE 'sk-ant-[a-zA-Z0-9_-]{20,}'; then
+            FOUND+="  $file:$LINE_NUM — Anthropic API key\n"
+        fi
+
+        # Pattern 2: AWS access keys
+        if echo "$line" | grep -qE 'AKIA[0-9A-Z]{16}'; then
+            FOUND+="  $file:$LINE_NUM — AWS access key\n"
+        fi
+
+        # Pattern 3: GitHub PATs
+        if echo "$line" | grep -qE 'ghp_[a-zA-Z0-9]{36}'; then
+            FOUND+="  $file:$LINE_NUM — GitHub token\n"
+        fi
+
+        # Pattern 4: Generic hardcoded credentials
+        if echo "$line" | grep -qiE '(password|token|api_key|apikey|secret|api_secret|access_key)\s*=\s*["\x27][^\x27"]{8,}'; then
+            FOUND+="  $file:$LINE_NUM — hardcoded credential\n"
+        fi
+
+    done <<< "$CONTENT"
+done
+
+if [ -n "$FOUND" ]; then
+    echo ""
+    echo "COMMIT BLOCKED: Hardcoded secrets detected"
+    echo ""
+    echo -e "$FOUND"
+    echo ""
+    echo "Fix: Move secrets to .env and use os.getenv()"
+    echo "Example:"
+    echo "  # In .env:"
+    echo "  FRED_API_KEY=your_key_here"
+    echo ""
+    echo "  # In Python:"
+    echo "  from dotenv import load_dotenv"
+    echo "  load_dotenv()"
+    echo "  api_key = os.getenv('FRED_API_KEY')"
+    echo ""
+    exit 1
+fi
+
+exit 0

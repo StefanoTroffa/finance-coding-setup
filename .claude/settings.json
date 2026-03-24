@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run python *)",
+      "Bash(uv pip install *)",
+      "Bash(uv add *)",
+      "Bash(uv run *)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(mkdir *)",
+      "Read(*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run python hooks/pre_write_quality.py",
+            "statusMessage": "Checking code quality..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run python hooks/post_bash_output.py",
+            "statusMessage": "Checking output quality..."
+          }
+        ]
+      }
+    ]
+  }
+}
