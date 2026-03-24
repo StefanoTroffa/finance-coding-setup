@@ -9,6 +9,79 @@ No prior coding experience required. You know finance — that's the hard part.
 
 ---
 
+## Quick Start (if someone invited you)
+
+If you got a link to this repo and just want to get going, here's the shortest path.
+Detailed explanations for each step are further down.
+
+**1. Install the basics (copy-paste each line one at a time):**
+
+Mac:
+```bash
+# Install uv (manages Python for you)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Close and reopen Terminal, then:
+
+# Install Node.js (needed for Claude Code)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install node
+```
+
+Windows (PowerShell):
+```powershell
+# Install uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Close and reopen PowerShell, then:
+
+# Install Node.js: download LTS from https://nodejs.org/ and run installer
+# Close and reopen PowerShell again after installing
+```
+
+**2. Install Claude Code:**
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+**3. Get your Claude API key:**
+- Go to [console.anthropic.com](https://console.anthropic.com/) → sign up → API Keys → Create Key
+- Copy the key (starts with `sk-ant-`)
+- You'll paste it in step 5
+
+**4. Set up GitHub and clone this repo:**
+```bash
+# Install git if you don't have it (Mac: xcode-select --install, Windows: git-scm.com)
+
+# Configure your identity
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Clone and set up
+cd ~/Desktop
+git clone https://github.com/StefanoTroffa/finance-coding-setup.git
+cd finance-coding-setup
+bash setup.sh
+```
+
+**5. Start:**
+```bash
+cd ~/Desktop/finance-coding-setup
+claude
+```
+
+Paste your API key when asked. Then type what you need:
+
+```
+Pull the last 6 months of daily prices for SPY and save to Excel
+```
+
+Your file appears in `~/finance-outputs/`. That's it.
+
+If something breaks, scroll down to [Troubleshooting](#troubleshooting).
+
+---
+
 ## What you'll be able to do
 
 Once set up, you talk to an AI assistant (Claude) in your terminal. It writes
